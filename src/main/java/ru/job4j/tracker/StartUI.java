@@ -12,7 +12,7 @@ import java.util.List;
 
 public class StartUI {
 
-    public void init(Input input, MemTracker tracker, List<UserAction> actions) {
+    public void init(Input input, Store tracker, List<UserAction> actions) {
         boolean run = true;
         while (run) {
             showMenu(actions);
@@ -31,20 +31,24 @@ public class StartUI {
 
 
     public static void main(String[] args) {
-        Input validate = new ValidateInput(
+        Input input = new ValidateInput(
                 new ConsoleInput()
         );
         Output output = new ConsoleOutput();
-        List<UserAction> actions = List.of(
-                new CreateAction(output),
-                new ReplaceAction(output),
-                new DeleteAction(output),
-                new FindAllAction(output),
-                new FindByIdAction(output),
-                new FindByNameAction(output),
-                new ExitAction()
-        );
-        MemTracker tracker = new MemTracker();
-        new StartUI().init(validate, tracker, actions);
+        try (SqlTracker tracker = new SqlTracker()) {
+            tracker.init();
+            List<UserAction> actions = List.of(
+                    new CreateAction(output),
+                    new ReplaceAction(output),
+                    new DeleteAction(output),
+                    new FindAllAction(output),
+                    new FindByIdAction(output),
+                    new FindByNameAction(output),
+                    new ExitAction()
+            );
+            new StartUI().init(input, tracker, actions);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
