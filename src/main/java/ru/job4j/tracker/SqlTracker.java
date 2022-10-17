@@ -114,8 +114,8 @@ public class SqlTracker implements Store, AutoCloseable {
             statement.setString(1, key);
             try (ResultSet set = statement.getResultSet()) {
                 while (set.next()) {
-                    for(Item item:items){
-                        if(key.equals(item.getName())){
+                    for (Item item : items) {
+                        if (key.equals(item.getName())) {
                             items.add(new Item(set.getInt(1), set.getString(2),
                                     set.getTimestamp(3).toLocalDateTime()));
                         }
