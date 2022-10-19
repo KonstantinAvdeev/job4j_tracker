@@ -22,6 +22,10 @@ public class SqlTracker implements Store, AutoCloseable {
         init();
     }
 
+    public SqlTracker(Connection connection) {
+        init();
+    }
+
     public void init() {
         try (InputStream in = SqlTracker.class.getClassLoader().getResourceAsStream("app.properties")) {
             Properties config = new Properties();
@@ -128,7 +132,7 @@ public class SqlTracker implements Store, AutoCloseable {
         try (PreparedStatement statement = cn.prepareStatement("select * from items where id = ?;")) {
             statement.setInt(1, id);
             try (ResultSet set = statement.getResultSet()) {
-                if (set.next() && id == set.getInt(1)) {
+                if (set.next()) {
                     item = returnItem(set);
                 }
             }
