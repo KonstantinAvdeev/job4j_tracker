@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -46,11 +47,10 @@ public class SqlTracker implements Store, AutoCloseable {
     @Override
     public Item add(Item item) {
         try (PreparedStatement statement =
-                     cn.prepareStatement("insert into items(id, name, created) values (?, ?, ?)",
+                     cn.prepareStatement("insert into items(name, created) values (?, ?)",
                              Statement.RETURN_GENERATED_KEYS)) {
-            statement.setInt(1, item.getId());
-            statement.setString(2, item.getName());
-            statement.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+            statement.setString(1, item.getName());
+            statement.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
             statement.execute();
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
@@ -69,8 +69,8 @@ public class SqlTracker implements Store, AutoCloseable {
         try (PreparedStatement statement =
                      cn.prepareStatement("update items set name = ?, created = ? where id = ?")) {
             statement.setString(1, item.getName());
-            statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-            statement.setInt(3, item.getId());
+            statement.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
+            statement.setInt(3, id);
             result = statement.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,8 +97,7 @@ public class SqlTracker implements Store, AutoCloseable {
         try (PreparedStatement statement = cn.prepareStatement("select * from items;")) {
             try (ResultSet set = statement.getResultSet()) {
                 while (set.next()) {
-                    items.add(new Item(set.getInt("id"), set.getString("name"),
-                            set.getTimestamp("created").toLocalDateTime()));
+                    items.add(returnItem(set));
                 }
             }
         } catch (Exception e) {
@@ -114,12 +113,7 @@ public class SqlTracker implements Store, AutoCloseable {
             statement.setString(1, key);
             try (ResultSet set = statement.getResultSet()) {
                 while (set.next()) {
-                    for (Item item : items) {
-                        if (key.equals(item.getName())) {
-                            items.add(new Item(set.getInt(1), set.getString(2),
-                                    set.getTimestamp(3).toLocalDateTime()));
-                        }
-                    }
+                    items.add(returnItem(set));
                 }
             }
         } catch (Exception e) {
@@ -134,15 +128,19 @@ public class SqlTracker implements Store, AutoCloseable {
         try (PreparedStatement statement = cn.prepareStatement("select * from items where id = ?;")) {
             statement.setInt(1, id);
             try (ResultSet set = statement.getResultSet()) {
-                while (set.next() && id == set.getInt(1)) {
-                    item = new Item(set.getInt(1), set.getString(2),
-                            set.getTimestamp(3).toLocalDateTime());
+                if (set.next() && id == set.getInt(1)) {
+                    item = returnItem(set);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return item;
+    }
+
+    public Item returnItem(ResultSet set) throws SQLException {
+        return new Item(set.getInt(1), set.getString(2),
+                set.getTimestamp(3).toLocalDateTime());
     }
 
 }

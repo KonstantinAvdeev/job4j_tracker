@@ -13,6 +13,10 @@ public class Item {
 
     private String name;
 
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
     private LocalDateTime created = LocalDateTime.now();
 
     public Item(String name) {
