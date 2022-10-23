@@ -153,8 +153,12 @@ public class SqlTracker implements Store, AutoCloseable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         SqlTracker that = (SqlTracker) o;
         return Objects.equals(cn, that.cn);
     }
