@@ -12,14 +12,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Properties;
 
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -61,20 +57,16 @@ public class SqlTrackerTest {
     @Test
     public void whenSaveItemAndFindByGeneratedIdThenMustBeTheSame() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
-        tracker.add(item);
+        Item item = tracker.add(new Item("item"));
         assertThat(tracker.findById(item.getId()), is(item));
     }
 
     @Test
     public void whenSaveItemsAndFindByNameThenMustBeTheSame() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
-        Item item2 = new Item("item2");
-        Item item3 = new Item("item");
-        tracker.add(item);
-        tracker.add(item2);
-        tracker.add(item3);
+        Item item = tracker.add(new Item("item"));
+        Item item2 = tracker.add(new Item("item2"));
+        Item item3 = tracker.add(new Item("item"));
         List<Item> expected = List.of(item, item3);
         assertEquals(tracker.findByName(item.getName()), expected);
     }
@@ -82,12 +74,9 @@ public class SqlTrackerTest {
     @Test
     public void whenSaveItemsAndFindAll() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
-        Item item2 = new Item("item2");
-        Item item3 = new Item("item3");
-        tracker.add(item);
-        tracker.add(item2);
-        tracker.add(item3);
+        Item item = tracker.add(new Item("item"));
+        Item item2 = tracker.add(new Item("item2"));
+        Item item3 = tracker.add(new Item("item3"));
         List<Item> expected = List.of(item, item2, item3);
         assertEquals(tracker.findAll(), expected);
     }
@@ -95,17 +84,15 @@ public class SqlTrackerTest {
     @Test
     public void whenSaveItem() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
+        Item item = tracker.add(new Item("item"));
         assertThat(tracker.add(item), is(item));
     }
 
     @Test
     public void whenSaveItemAndReplace() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
-        Item item2 = new Item("item2");
-        tracker.add(item);
-        tracker.add(item2);
+        Item item = tracker.add(new Item("item"));
+        Item item2 = tracker.add(new Item("item2"));
         Item item3 = new Item("item3");
         assertTrue(tracker.replace(item.getId(), item3));
         assertEquals(tracker.findById(item.getId()), tracker.findByName(item3.getName()).get(0));
@@ -114,10 +101,8 @@ public class SqlTrackerTest {
     @Test
     public void whenSaveItemAndDelete() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = new Item("item");
-        Item item2 = new Item("item2");
-        tracker.add(item);
-        tracker.add(item2);
+        Item item = tracker.add(new Item("item"));
+        Item item2 = tracker.add(new Item("item2"));
         assertTrue(tracker.delete(item.getId()));
         assertNull(tracker.findById(item.getId()));
     }
