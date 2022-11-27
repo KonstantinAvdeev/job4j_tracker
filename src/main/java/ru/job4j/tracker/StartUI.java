@@ -34,8 +34,8 @@ public class StartUI {
                 new ConsoleInput()
         );
         Output output = new ConsoleOutput();
-        try (SqlTracker tracker = new SqlTracker()) {
-            tracker.init();
+        Store tracker = new MemTracker();
+        try {
             List<UserAction> actions = List.of(
                     new CreateAction(output),
                     new ReplaceAction(output),
@@ -43,7 +43,9 @@ public class StartUI {
                     new FindAllAction(output),
                     new FindByIdAction(output),
                     new FindByNameAction(output),
-                    new ExitAction()
+                    new ExitAction(),
+                    new Add100000Action(),
+                    new Delete100000Actions()
             );
             new StartUI().init(input, tracker, actions);
         } catch (Exception e) {
