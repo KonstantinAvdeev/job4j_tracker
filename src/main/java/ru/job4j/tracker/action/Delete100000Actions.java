@@ -12,8 +12,8 @@ public class Delete100000Actions implements UserAction {
 
     @Override
     public boolean execute(Input input, Store tracker) {
-        for (int i = tracker.findAll().size()-1, j = i-100000; i > j; i--) {
-           tracker.delete(i);
+        for (int i = tracker.findAll().size() - 1, j = i - 100000; i > j; i--) {
+            tracker.delete(i);
         }
         System.out.println("All items successfully deleted!");
         return true;
