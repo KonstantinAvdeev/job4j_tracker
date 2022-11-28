@@ -10,7 +10,7 @@ public class Delete100000Actions implements UserAction {
 
     @Override
     public String name() {
-        return "==== Delete last 100000 Items ====";
+        return "==== Delete 100000 Items ====";
     }
 
     @Override
